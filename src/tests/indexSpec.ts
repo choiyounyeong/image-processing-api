@@ -5,22 +5,23 @@ import app from '../index';
 const request = supertest(app);
 
 describe('1. Test endpoint response', () => {
-  it('gets the api/images endpoint', async done => {
-    const response = await request.get('/api/images');
+  it('gets the /images/list endpoint', async () => {
+    const response = await request.get('/images/list');
     expect(response.status).toBe(200);
-    done();
   });
 });
 
-describe('2. Image transform functino should resolve or reject', () => {
-  it('Expect transform to not throw error', async done => {
-    const response = await request.get('/api/images');
-    expect(response.status).toBe(200);
-    done();
+describe('2. Test image resizing', () => {
+  it('successfully resize an image', async () => {
+    const response = await request
+      .get('/images/resize')
+      .query({ filename: 'fjord', width: 100, height: 100 })
+      .expect(200);
   });
-  it('Expect transform to throw specific error', async done => {
-    const response = await request.get('/api/images');
-    expect(response.status).toBe(200);
-    done();
+  it('failed resize an image because of wrong input', async () => {
+    const response = await request
+      .get('/images/resize')
+      .query({ filename: 'fjord.jpg', width: 100, height: 100 })
+      .expect(400);
   });
 });

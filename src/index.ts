@@ -28,17 +28,22 @@ app.get('/images/list', logger, async (req, res) => {
 // Provide resized image
 app.get('/images/resize', logger, async (req, res) => {
   const filename = req.query.filename;
-  const height = req.query.height;
-  const width = req.query.width;
+  const height = Number(req.query.height);
+  const width = Number(req.query.width);
   const originalFilepathRel = `images/full/${filename}.jpg`;
   const originalFilepathAbs = path.resolve(originalFilepathRel);
   if (fs.existsSync(originalFilepathAbs)) {
-    const targetFilepathRel = `images/thumb/${filename}.jpg`;
+    const targetFilepathRel = `images/thumb/${filename}-${width}-${height}.jpg`;
     const targetFilepathAbs = path.resolve(targetFilepathRel);
-    await sharp(originalFilepathAbs)
-      .resize(Number(width), Number(height))
-      .toFile(targetFilepathAbs);
-    res.sendFile(targetFilepathAbs);
+    // if already exists(cached), just return
+    if (fs.existsSync(targetFilepathAbs)) {
+      res.sendFile(targetFilepathAbs);
+    } else {
+      await sharp(originalFilepathAbs)
+        .resize(width, height)
+        .toFile(targetFilepathAbs);
+      res.sendFile(targetFilepathAbs);
+    }
   } else {
     res.status(400);
     res.send('Image does not exist');
