@@ -51,8 +51,14 @@ app.get(
     const originalFilepathRel = `images/full/${filename}.jpg`;
     const originalFilepathAbs = path.resolve(originalFilepathRel);
     if (fs.existsSync(originalFilepathAbs)) {
-      const targetFilepathRel = `images/thumb/${filename}-${width}-${height}.jpg`;
+      const imageSaveFolder = 'images/thumb';
+      const targetFilepathRel = `${imageSaveFolder}/${filename}-${width}-${height}.jpg`;
       const targetFilepathAbs = path.resolve(targetFilepathRel);
+
+      if (!fs.existsSync(imageSaveFolder)) {
+        fs.mkdirSync(imageSaveFolder);
+      }
+
       // if already exists(cached), just return
       if (fs.existsSync(targetFilepathAbs)) {
         res.sendFile(targetFilepathAbs);

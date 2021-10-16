@@ -1,4 +1,3 @@
-import { response } from 'express';
 import supertest from 'supertest';
 import app from '../index';
 
