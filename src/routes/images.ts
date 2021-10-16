@@ -2,7 +2,7 @@ import express from 'express';
 import { Request, Response } from 'express';
 import path from 'path';
 import logger from '../utilities/logger';
-import sharp from 'sharp';
+import imageProcessor from '../utilities/imageProcessor';
 import { readdir } from 'fs/promises';
 import fs from 'fs';
 const imageRoute = express.Router();
@@ -53,9 +53,13 @@ imageRoute.get(
       if (fs.existsSync(targetFilepathAbs)) {
         res.sendFile(targetFilepathAbs);
       } else {
-        await sharp(originalFilepathAbs)
-          .resize(width, height)
-          .toFile(targetFilepathAbs);
+        await imageProcessor.resizeImage(
+          originalFilepathAbs,
+          targetFilepathAbs,
+          width,
+          height
+        );
+
         res.sendFile(targetFilepathAbs);
       }
     } else {
