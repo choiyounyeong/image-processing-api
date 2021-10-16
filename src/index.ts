@@ -41,6 +41,13 @@ app.get(
     const filename = req.query.filename;
     const height = Number(req.query.height);
     const width = Number(req.query.width);
+
+    if (isNaN(height) || isNaN(width)) {
+      res.status(400);
+      res.send('Invalid height and width');
+      return;
+    }
+
     const originalFilepathRel = `images/full/${filename}.jpg`;
     const originalFilepathAbs = path.resolve(originalFilepathRel);
     if (fs.existsSync(originalFilepathAbs)) {

@@ -17,12 +17,20 @@ describe('2. Test image resizing', (): void => {
       .query({ filename: 'fjord', width: 100, height: 100 })
       .expect(200);
   });
-  it('failed resize an image because of wrong input', async (): Promise<
+  it('failed resize an image because of wrong filename', async (): Promise<
     void
   > => {
     await request
       .get('/images/resize')
       .query({ filename: 'fjord.jpg', width: 100, height: 100 })
+      .expect(400);
+  });
+  it('failed resize an image because of wrong width and height', async (): Promise<
+    void
+  > => {
+    await request
+      .get('/images/resize')
+      .query({ filename: 'fjord', width: 'very fat', height: 'very tall' })
       .expect(400);
   });
 });
