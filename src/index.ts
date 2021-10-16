@@ -1,4 +1,5 @@
 import express from 'express';
+import { Request, Response } from 'express';
 import path from 'path';
 import logger from './utilities/logger';
 import sharp from 'sharp';
@@ -9,50 +10,58 @@ const app = express();
 const port = 3000;
 
 // Image API homepage
-app.get('/', (req, res) => {
-  res.send('This is the homepage for image handling');
-});
+app.get(
+  '/',
+  async (req: Request, res: Response): Promise<void> => {
+    res.send('This is the homepage for image handling');
+  }
+);
 
 // Provide the current image list
-app.get('/images/list', logger, async (req, res) => {
-  try {
-    const imageFolder = path.resolve(`images/full`);
-    const filenames = await readdir(imageFolder);
-    const imagenames = filenames.map(f => f.split('.')[0]);
-    res.send(imagenames);
-  } catch (err) {
-    res.send('There is an error');
+app.get(
+  '/images/list',
+  logger,
+  async (req: Request, res: Response): Promise<void> => {
+    try {
+      const imageFolder = path.resolve(`images/full`);
+      const filenames = await readdir(imageFolder);
+      const imagenames = filenames.map(f => f.split('.')[0]);
+      res.send(imagenames);
+    } catch (err) {
+      res.send('There is an error');
+    }
   }
-});
+);
 
 // Provide resized image
-app.get('/images/resize', logger, async (req, res) => {
-  const filename = req.query.filename;
-  const height = Number(req.query.height);
-  const width = Number(req.query.width);
-  const originalFilepathRel = `images/full/${filename}.jpg`;
-  const originalFilepathAbs = path.resolve(originalFilepathRel);
-  if (fs.existsSync(originalFilepathAbs)) {
-    const targetFilepathRel = `images/thumb/${filename}-${width}-${height}.jpg`;
-    const targetFilepathAbs = path.resolve(targetFilepathRel);
-    // if already exists(cached), just return
-    if (fs.existsSync(targetFilepathAbs)) {
-      res.sendFile(targetFilepathAbs);
+app.get(
+  '/images/resize',
+  logger,
+  async (req: Request, res: Response): Promise<void> => {
+    const filename = req.query.filename;
+    const height = Number(req.query.height);
+    const width = Number(req.query.width);
+    const originalFilepathRel = `images/full/${filename}.jpg`;
+    const originalFilepathAbs = path.resolve(originalFilepathRel);
+    if (fs.existsSync(originalFilepathAbs)) {
+      const targetFilepathRel = `images/thumb/${filename}-${width}-${height}.jpg`;
+      const targetFilepathAbs = path.resolve(targetFilepathRel);
+      // if already exists(cached), just return
+      if (fs.existsSync(targetFilepathAbs)) {
+        res.sendFile(targetFilepathAbs);
+      } else {
+        await sharp(originalFilepathAbs)
+          .resize(width, height)
+          .toFile(targetFilepathAbs);
+        res.sendFile(targetFilepathAbs);
+      }
     } else {
-      await sharp(originalFilepathAbs)
-        .resize(width, height)
-        .toFile(targetFilepathAbs);
-      res.sendFile(targetFilepathAbs);
+      res.status(400);
+      res.send('Image does not exist');
     }
-  } else {
-    res.status(400);
-    res.send('Image does not exist');
   }
-});
+);
 
-// Print message in terminal
-app.listen(port, () => {
-  console.log(`server started at localhost: ${port}`);
-});
+app.listen(port);
 
 export default app;

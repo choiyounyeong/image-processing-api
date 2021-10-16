@@ -4,22 +4,23 @@ import app from '../index';
 
 const request = supertest(app);
 
-describe('1. Test endpoint response', () => {
-  it('gets the /images/list endpoint', async () => {
-    const response = await request.get('/images/list');
-    expect(response.status).toBe(200);
+describe('1. Test endpoint response', (): void => {
+  it('gets the /images/list endpoint', async (): Promise<void> => {
+    await request.get('/images/list').expect(200);
   });
 });
 
-describe('2. Test image resizing', () => {
-  it('successfully resize an image', async () => {
-    const response = await request
+describe('2. Test image resizing', (): void => {
+  it('successfully resize an image', async (): Promise<void> => {
+    await request
       .get('/images/resize')
       .query({ filename: 'fjord', width: 100, height: 100 })
       .expect(200);
   });
-  it('failed resize an image because of wrong input', async () => {
-    const response = await request
+  it('failed resize an image because of wrong input', async (): Promise<
+    void
+  > => {
+    await request
       .get('/images/resize')
       .query({ filename: 'fjord.jpg', width: 100, height: 100 })
       .expect(400);
