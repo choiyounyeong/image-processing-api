@@ -40,7 +40,7 @@ Run Start to start the server running on port 3000. During the server is running
 
 There are multiple endpoints you can explore.
 
-- List (http://local:3000/images/list):
+- List (http://localhost:3000/images/list):
   To get an array of the image name before trying image resizing.
 
 - Resize (http://localhost:3000/images/resize?filename=fjord&width=150&height=150): To get the resized image based on the parameters.
